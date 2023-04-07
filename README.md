@@ -2,6 +2,7 @@
 
 This repo can be used to deploy [Redash] on Render.
 
+- Using 10.1 as suggested by https://github.com/render-examples/redash/issues/1#issuecomment-1252110312
 - It uses the [official Redash Docker image](https://hub.docker.com/r/redash/redash) with an entrypoint script that customizes Redash for Render.
 - It creates a Web Service on **Standard** plan for Redash and two [Background Workers](https://render.com/docs/background-workers) for job processing.
 - [Render Databases](https://render.com/docs/databases) are used to spin up a fully managed PostgreSQL instance.

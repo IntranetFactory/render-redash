@@ -1,106 +1,137 @@
 databases:
-  - name: redash
+  - name: redash postgres14
+    region: frankfurt
+    plan: Starter
+    postgresMajorVersion: 14
     databaseName: redash
     user: redash
 
 services:
-  # Do not forget to run `render-redash create_db` in Render Shell after creating this service.
-  - type: web
-    name: redash
+  - name: redash
+    type: web
+    autoDeploy: false
+    region: frankfurt
+    plan: Starter
     env: docker
-    plan: standard
+    dockerfilePath: ./redash/Dockerfile
     dockerCommand: render-redash server
-    autoDeploy: false
+    healthCheckPath: /ping
+    domains:
+      - redash.example.com
     envVars:
+      - fromGroup: redash
       - key: REDASH_DATABASE_URL
         fromDatabase:
-          name: redash
+          name: redash postgres14
           property: connectionString
-      - key: REDIS_HOSTPORT
+      - key: REDASH_REDIS_URL
         fromService:
-          type: pserv
-          name: redash-redis
-          property: hostport
-      - fromGroup: redash-shared
-      - fromGroup: redash-mail
+          name: redash redis
+          type: redis
+          property: connectionString
+      - key: PORT
+        value: 5000
+      - key: REDASH_WEB_WORKERS
+        value: 1
 
-  - type: worker
-    name: redash-scheduler
-    env: docker
-    dockerCommand: render-redash scheduler
+  - name: redash scheduler
+    type: worker
     autoDeploy: false
+    region: frankfurt
+    plan: Starter
+    env: docker
+    dockerfilePath: ./redash/Dockerfile
+    dockerCommand: render-redash scheduler
     envVars:
+      - fromGroup: redash
       - key: REDASH_DATABASE_URL
         fromDatabase:
-          name: redash
+          name: redash postgres14
           property: connectionString
-      - key: REDIS_HOSTPORT
+      - key: REDASH_REDIS_URL
         fromService:
-          type: pserv
-          name: redash-redis
-          property: hostport
-      - fromGroup: redash-shared
-      - fromGroup: redash-mail
+          name: redash redis
+          type: redis
+          property: connectionString
       - key: QUEUES
         value: "celery"
       - key: WORKERS_COUNT
         value: 1
 
-  - type: worker
-    name: redash-worker
-    env: docker
-    plan: standard
-    dockerCommand: render-redash worker
+  - name: redash worker scheduled
+    type: worker
     autoDeploy: false
+    region: frankfurt
+    plan: Starter
+    env: docker
+    dockerfilePath: ./redash/Dockerfile
+    dockerCommand: render-redash worker
     envVars:
+      - fromGroup: redash
       - key: REDASH_DATABASE_URL
         fromDatabase:
-          name: redash
+          name: redash postgres14
           property: connectionString
-      - key: REDIS_HOSTPORT
+      - key: REDASH_REDIS_URL
         fromService:
-          type: pserv
-          name: redash-redis
-          property: hostport
-      - fromGroup: redash-shared
-      - fromGroup: redash-mail
+          name: redash redis
+          type: redis
+          property: connectionString
       - key: QUEUES
-        value: "queries,scheduled_queries,schemas"
+        value: "scheduled_queries,schemas"
+      - key: WORKERS_COUNT
+        value: 1
 
-  - type: pserv
-    name: redash-redis
-    env: docker
-    repo: https://github.com/render-examples/redis.git
+  - name: redash worker adhoc
+    type: worker
     autoDeploy: false
-    disk:
-      name: data
-      mountPath: /var/lib/redis
-      sizeGB: 10
+    region: frankfurt
+    plan: Starter
+    env: docker
+    dockerfilePath: ./redash/Dockerfile
+    dockerCommand: render-redash worker
+    envVars:
+      - fromGroup: redash
+      - key: REDASH_DATABASE_URL
+        fromDatabase:
+          name: redash postgres14
+          property: connectionString
+      - key: REDASH_REDIS_URL
+        fromService:
+          name: redash redis
+          type: redis
+          property: connectionString
+      - key: QUEUES
+        value: "queries,periodic,emails,default"
+      - key: WORKERS_COUNT
+        value: 1
+
+  - name: redash redis
+    type: redis
+    region: frankfurt
+    plan: Starter
+    maxmemoryPolicy: noeviction
 
 envVarGroups:
-  - name: redash-shared
+  - name: redash
     envVars:
       - key: REDASH_LOG_LEVEL
         value: "INFO"
       - key: REDASH_COOKIE_SECRET
         generateValue: true
-
-  # Uncomment and fill following fields if you wish to set up mailing in Redash.
-  # It’s recommended to use some mail service, like Amazon SES or Mailgun
-  # to send emails to ensure deliverability.
-  - name: redash-mail
-    envVars:
-#      - key: REDASH_MAIL_SERVER
-#        value: (SMTP server address)
-#      - key: REDASH_MAIL_PORT
-#        value: 25
-#      - key: REDASH_MAIL_USE_TLS
-#        value: false
-#      - key: REDASH_MAIL_USE_SSL
-#        value: false
-#      - key: REDASH_MAIL_USERNAME
-#        value: None
-#      - key: REDASH_MAIL_PASSWORD
-#        value: None
-#      - key: REDASH_MAIL_DEFAULT_SENDER
-#        value: (Email address to send from)
+      - key: REDASH_SECRET_KEY
+        generateValue: true
+      - key: REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS
+        value: true
+      - key: REDASH_MAIL_SERVER
+        value: smtp.postmarkapp.com
+      - key: REDASH_MAIL_PORT
+        value: 587
+      - key: REDASH_MAIL_USE_TLS
+        value: true
+      - key: REDASH_MAIL_USERNAME
+        sync: false # It is the postmark server "tools" API token
+      - key: REDASH_MAIL_PASSWORD
+        sync: false # It is the postmark server "tools" API token
+      - key: REDASH_MAIL_DEFAULT_SENDER
+        value: redash@example.com

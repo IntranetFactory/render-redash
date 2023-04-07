@@ -10,8 +10,7 @@ services:
     type: web
     autoDeploy: false    
     plan: Starter
-    env: docker
-    dockerfilePath: ./redash/Dockerfile
+    env: docker    
     dockerCommand: render-redash server
     healthCheckPath: /ping
     domains:
@@ -36,8 +35,7 @@ services:
     type: worker
     autoDeploy: false    
     plan: Starter
-    env: docker
-    dockerfilePath: ./redash/Dockerfile
+    env: docker    
     dockerCommand: render-redash scheduler
     envVars:
       - fromGroup: redash
@@ -59,8 +57,7 @@ services:
     type: worker
     autoDeploy: false    
     plan: Starter
-    env: docker
-    dockerfilePath: ./redash/Dockerfile
+    env: docker    
     dockerCommand: render-redash worker
     envVars:
       - fromGroup: redash
@@ -82,8 +79,7 @@ services:
     type: worker
     autoDeploy: false    
     plan: Starter
-    env: docker
-    dockerfilePath: ./redash/Dockerfile
+    env: docker    
     dockerCommand: render-redash worker
     envVars:
       - fromGroup: redash

@@ -1,6 +1,5 @@
 databases:
-  - name: redash postgres14
-    region: frankfurt
+  - name: redash postgres14    
     plan: Starter
     postgresMajorVersion: 14
     databaseName: redash
@@ -9,8 +8,7 @@ databases:
 services:
   - name: redash
     type: web
-    autoDeploy: false
-    region: frankfurt
+    autoDeploy: false    
     plan: Starter
     env: docker
     dockerfilePath: ./redash/Dockerfile
@@ -36,8 +34,7 @@ services:
 
   - name: redash scheduler
     type: worker
-    autoDeploy: false
-    region: frankfurt
+    autoDeploy: false    
     plan: Starter
     env: docker
     dockerfilePath: ./redash/Dockerfile
@@ -60,8 +57,7 @@ services:
 
   - name: redash worker scheduled
     type: worker
-    autoDeploy: false
-    region: frankfurt
+    autoDeploy: false    
     plan: Starter
     env: docker
     dockerfilePath: ./redash/Dockerfile
@@ -84,8 +80,7 @@ services:
 
   - name: redash worker adhoc
     type: worker
-    autoDeploy: false
-    region: frankfurt
+    autoDeploy: false    
     plan: Starter
     env: docker
     dockerfilePath: ./redash/Dockerfile
@@ -107,8 +102,7 @@ services:
         value: 1
 
   - name: redash redis
-    type: redis
-    region: frankfurt
+    type: redis    
     plan: Starter
     maxmemoryPolicy: noeviction
     ipAllowList: []

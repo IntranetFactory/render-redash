@@ -111,6 +111,7 @@ services:
     region: frankfurt
     plan: Starter
     maxmemoryPolicy: noeviction
+    ipAllowList: []
 
 envVarGroups:
   - name: redash

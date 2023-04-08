@@ -115,14 +115,14 @@ envVarGroups:
       - key: REDASH_FEATURE_ALLOW_CUSTOM_JS_VISUALIZATIONS
         value: true
       - key: REDASH_MAIL_SERVER
-        value: smtp.postmarkapp.com
+        value: smtp-relay.sendinblue.com
       - key: REDASH_MAIL_PORT
         value: 587
       - key: REDASH_MAIL_USE_TLS
         value: true
       - key: REDASH_MAIL_USERNAME
-        sync: false # It is the postmark server "tools" API token
+        sync: false 
       - key: REDASH_MAIL_PASSWORD
-        sync: false # It is the postmark server "tools" API token
+        sync: false 
       - key: REDASH_MAIL_DEFAULT_SENDER
-        value: redash@example.com
+        value: supportteam@adenin.com

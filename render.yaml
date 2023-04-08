@@ -14,7 +14,7 @@ services:
     dockerCommand: render-redash server
     healthCheckPath: /ping
     domains:
-      - redash.example.com
+      - dashboardfactory.app
     envVars:
       - fromGroup: redash
       - key: REDASH_DATABASE_URL
